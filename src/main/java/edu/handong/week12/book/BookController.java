@@ -6,6 +6,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 
 import java.util.List;
 
@@ -19,8 +23,9 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookResponse>> list() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<BookResponse>> list(
+            @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
     } // TODO: Pageable
 
     @GetMapping("/{id}")
@@ -29,12 +34,14 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<BookResponse> create(@Valid @RequestBody BookRequest request) {        BookResponse created = service.create(request);
+    public ResponseEntity<BookResponse> create(@Valid @RequestBody BookRequest request) {
+        BookResponse created = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     } // TODO: @Valid, ResponseEntity 201
 
     @PutMapping("/{id}")
-    public ResponseEntity<BookResponse> update(@PathVariable Long id, @Valid @RequestBody BookRequest request) {        return ResponseEntity.ok(service.update(id, request));
+    public ResponseEntity<BookResponse> update(@PathVariable Long id, @Valid @RequestBody BookRequest request) {
+        return ResponseEntity.ok(service.update(id, request));
     }
 
     @DeleteMapping("/{id}")
